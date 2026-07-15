@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": { "recipe": "beyond_practical:net_type_pathway" },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [["has_the_recipe"]],
+  "rewards": { "recipes": ["beyond_practical:net_type_pathway"] },
+  "sends_telemetry_event": false
+}

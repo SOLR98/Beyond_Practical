@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": { "item": "beyonddimensions:net_pathway" },
+    "B": { "item": "minecraft:comparator" },
+    "C": { "item": "beyonddimensions:space_time_stable_frame" }
+  },
+  "pattern": [
+    " C ",
+    "BAB"
+  ],
+  "result": {
+    "item": "beyond_practical:net_type_pathway"
+  },
+  "show_notification": true
+}
