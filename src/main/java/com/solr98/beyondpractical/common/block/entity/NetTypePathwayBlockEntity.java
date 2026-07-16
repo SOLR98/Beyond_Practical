@@ -4,8 +4,9 @@ import com.solr98.beyondpractical.common.init.BPBlockEntities;
 import com.solr98.beyondpractical.common.menu.NetTypePathwayMenu;
 import com.wintercogs.beyonddimensions.api.capability.helper.CapabilityHelper;
 import com.wintercogs.beyonddimensions.api.dimensionnet.DimensionsNet;
+import com.wintercogs.beyonddimensions.api.storage.handler.impl.StackHandler;
 import com.wintercogs.beyonddimensions.api.storage.key.IStackKey;
-import com.wintercogs.beyonddimensions.api.storage.key.impl.ItemStackKey;
+import com.wintercogs.beyonddimensions.api.storage.key.KeyAmount;
 import com.wintercogs.beyonddimensions.api.util.CapCtx;
 import com.wintercogs.beyonddimensions.api.util.USHandler;
 import com.wintercogs.beyonddimensions.common.block.entity.NetedBlockEntity;
@@ -19,12 +20,10 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,10 +37,10 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
     private final Map<SidedCapId, LazyOptional<?>> caps = new HashMap<>();
 
     private static final int FILTER_SLOTS = 9;
-    private final ItemStackHandler filterSlots = new ItemStackHandler(FILTER_SLOTS)
+    private final StackHandler filterSlots = new StackHandler(FILTER_SLOTS)
     {
         @Override
-        protected void onContentsChanged(int slot)
+        public void onChange()
         {
             if (level != null && !level.isClientSide())
             {
@@ -57,21 +56,20 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         addNetChangeTask(this::clearCapCache);
     }
 
-    // ========== 物品级白名单 ==========
+    // ========== 白名单 ==========
 
-    public ItemStackHandler getFilterSlots()
+    public StackHandler getFilterSlots()
     {
         return filterSlots;
     }
 
-    private List<IStackKey<?>> buildWhitelist()
+    private List<IStackKey<?>> getWhitelistForType(ResourceLocation typeId)
     {
         List<IStackKey<?>> list = new ArrayList<>();
-        for (int i = 0; i < filterSlots.getSlots(); i++)
+        for (KeyAmount ka : filterSlots.getStorage())
         {
-            ItemStack stack = filterSlots.getStackInSlot(i);
-            if (!stack.isEmpty())
-                list.add(new ItemStackKey(stack));
+            if (!ka.isEmpty() && ka.key().getTypeId().equals(typeId))
+                list.add(ka.key());
         }
         return list;
     }
@@ -93,9 +91,9 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
             if (cached != null && cached.isPresent())
                 return cached.cast();
 
-            Object result;
-            List<IStackKey<?>> whitelist = buildWhitelist();
+            List<IStackKey<?>> whitelist = getWhitelistForType(entry.getKey());
 
+            Object result;
             if (!whitelist.isEmpty() && entry.getValue() == ForgeCapabilities.ITEM_HANDLER)
                 result = new FilteredItemHandler(net.getUnifiedStorage(), whitelist);
             else if (!whitelist.isEmpty() && entry.getValue() == ForgeCapabilities.FLUID_HANDLER)

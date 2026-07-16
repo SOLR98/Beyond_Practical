@@ -2,14 +2,14 @@ package com.solr98.beyondpractical.common.menu;
 
 import com.solr98.beyondpractical.common.block.entity.NetTypePathwayBlockEntity;
 import com.solr98.beyondpractical.common.init.BPMenus;
+import com.wintercogs.beyonddimensions.api.storage.handler.impl.StackHandler;
 import com.wintercogs.beyonddimensions.client.gui.CommonTextures;
 import com.wintercogs.beyonddimensions.common.menu.BDBaseMenu;
+import com.wintercogs.beyonddimensions.common.menu.widget.slot.FlagStackTypedSlot;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class NetTypePathwayMenu extends BDBaseMenu
@@ -33,9 +33,9 @@ public class NetTypePathwayMenu extends BDBaseMenu
 
         if (blockEntity != null)
         {
-            ItemStackHandler filterSlots = blockEntity.getFilterSlots();
+            StackHandler filterSlots = blockEntity.getFilterSlots();
             for (int i = 0; i < filterSlots.getSlots(); i++)
-                addSlot(new SlotItemHandler(filterSlots, i, 8 + i * 18, slotStartY));
+                addSlot(new FlagStackTypedSlot(this, filterSlots, i, 8 + i * 18, slotStartY));
         }
 
         for (int row = 0; row < 3; row++)

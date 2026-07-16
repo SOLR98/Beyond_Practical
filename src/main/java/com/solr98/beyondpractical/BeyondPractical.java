@@ -8,7 +8,6 @@ import com.solr98.beyondpractical.common.init.BPMenus;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
@@ -21,13 +20,12 @@ public class BeyondPractical
 {
     public BeyondPractical()
     {
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        BPBlocks.register(eventBus);
-        BPBlockEntities.register(eventBus);
-        BPMenus.register(eventBus);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.addListener(BeyondPractical::clientSetup));
-
-        MinecraftForge.EVENT_BUS.addListener(this::addCreativeTab);
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        BPBlocks.register(modEventBus);
+        BPBlockEntities.register(modEventBus);
+        BPMenus.register(modEventBus);
+        modEventBus.addListener(this::addCreativeTab);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(BeyondPractical::clientSetup));
     }
 
     private void addCreativeTab(BuildCreativeModeTabContentsEvent event)

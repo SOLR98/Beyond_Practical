@@ -80,12 +80,12 @@ public class FilteredFluidHandler implements IFluidHandler
     }
 
     @Override
-    public @NotNull FluidStack drain(int count, FluidAction fluidAction)
+    public @NotNull FluidStack drain(int maxDrain, FluidAction fluidAction)
     {
         if (whitelist.isEmpty())
             return FluidStack.EMPTY;
         IStackKey<?> firstKey = whitelist.get(0);
-        if (storage.extract(firstKey, count, fluidAction.simulate(), false).toStack() instanceof FluidStack result)
+        if (storage.extract(firstKey, maxDrain, fluidAction.simulate(), false).toStack() instanceof FluidStack result)
             return result;
         return FluidStack.EMPTY;
     }
