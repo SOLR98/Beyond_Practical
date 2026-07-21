@@ -53,6 +53,7 @@ public class CraftingPatternTransferHandler implements IRecipeTransferHandler<Ne
             inputs.add(slotView);
 
         ItemStack[] fill = new ItemStack[9];
+        java.util.Arrays.fill(fill, ItemStack.EMPTY);
         for (int i = 0; i < 9 && i < inputs.size(); i++)
         {
             var slotView = inputs.get(i);

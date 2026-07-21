@@ -147,10 +147,14 @@ public class NetCrafterMenu extends BDBaseMenu
     {
         if (blockEntity != null)
         {
-            blockEntity.setOutputMode(OutputMode.valueOf(tag.getString("outputMode")));
-            blockEntity.controlMode = RedStoneControlMode.valueOf(tag.getString("controlMode"));
-            blockEntity.setOutputDirections(tag.getInt("outputDirections"));
-            blockEntity.setBatchSize(tag.getInt("batchSize"));
+            if (tag.contains("outputMode"))
+                blockEntity.setOutputMode(OutputMode.valueOf(tag.getString("outputMode")));
+            if (tag.contains("controlMode"))
+                blockEntity.controlMode = RedStoneControlMode.valueOf(tag.getString("controlMode"));
+            if (tag.contains("outputDirections"))
+                blockEntity.setOutputDirections(tag.getInt("outputDirections"));
+            if (tag.contains("batchSize"))
+                blockEntity.setBatchSize(tag.getInt("batchSize"));
             if (tag.contains("recipeId"))
                 blockEntity.setSelectedRecipeId(ResourceLocation.tryParse(tag.getString("recipeId")));
         }

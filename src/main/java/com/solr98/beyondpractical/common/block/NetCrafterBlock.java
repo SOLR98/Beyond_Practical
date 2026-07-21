@@ -30,12 +30,12 @@ public class NetCrafterBlock extends BaseMachineBlock
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit)
     {
-        super.use(state, level, pos, player, hand, hit);
         if (!level.isClientSide() && !player.isShiftKeyDown())
         {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof NetCrafterBlockEntity crafter)
                 NetworkHooks.openScreen((ServerPlayer) player, crafter, pos);
+            return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;
     }

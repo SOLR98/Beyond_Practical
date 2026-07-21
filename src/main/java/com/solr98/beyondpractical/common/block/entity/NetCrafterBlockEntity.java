@@ -132,6 +132,19 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
 
         if (selectedRecipeId == null) return cachedStatus = CrafterStatus.INVALID_PATTERN;
 
+        // 客户端无网络数据，只返回图案+配方有效状态
+        if (level.isClientSide())
+        {
+            var recipe = cachedRecipe;
+            if (recipe == null)
+            {
+                var r = level.getRecipeManager().byKey(selectedRecipeId);
+                if (r.isEmpty() || !(r.get() instanceof CraftingRecipe cr)) return cachedStatus = CrafterStatus.INVALID_PATTERN;
+            }
+            return cachedStatus = CrafterStatus.RECIPE_READY;
+        }
+
+        // 服务端检查网络连接
         if (getNet() == null) return cachedStatus = CrafterStatus.RESOURCE_BLOCKED;
 
         var recipe = cachedRecipe;
@@ -142,7 +155,7 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
             recipe = cr;
         }
 
-        // 检查原料是否充足（合并相同材料后再模拟，避免多格同种材料乐观误报）
+        // 合并材料需求检查
         var ingredients = recipe.getIngredients();
         var us = getNet().getUnifiedStorage();
         java.util.Map<ItemStackKey, Long> merged = new java.util.HashMap<>();
@@ -170,10 +183,18 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
     public void setSelectedRecipeId(@Nullable ResourceLocation id)
     {
         if (level == null || level.isClientSide()) return;
-        if (id == null) { selectedRecipeId = null; return; }
+        cachedStatus = null;
+        cappedRemainders = null;
+        if (id == null)
+        {
+            selectedRecipeId = null;
+            cachedRecipe = null;
+            cachedStandard = false;
+            setChanged();
+            return;
+        }
         var recipe = level.getRecipeManager().byKey(id);
         if (recipe.isEmpty() || !(recipe.get() instanceof CraftingRecipe cr)) return;
-        cachedStatus = null;
         selectedRecipeId = id;
         cachedRecipe = cr;
         classifyRecipe(cr);
@@ -655,9 +676,9 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
         patternSlots.deserializeNBT(tag.getCompound("patternSlots"));
         cachedPatternItemKeys = null;
         selectedRecipeId = tag.contains("recipeId") ? ResourceLocation.tryParse(tag.getString("recipeId")) : null;
-        batchSize = tag.getInt("batchSize");
-        outputMode = OutputMode.valueOf(tag.getString("outputMode"));
-        outputDirections = tag.getInt("outputDirections");
+        batchSize = tag.contains("batchSize") ? tag.getInt("batchSize") : 64;
+        outputMode = tag.contains("outputMode") ? OutputMode.valueOf(tag.getString("outputMode")) : OutputMode.NETWORK;
+        outputDirections = tag.contains("outputDirections") ? tag.getInt("outputDirections") : 0x3F;
         batchBuffer.deserializeNBT(tag.getCompound("batchBuffer"));
         outputStorage.deserializeNBT(tag.getCompound("outputStorage"));
     }
