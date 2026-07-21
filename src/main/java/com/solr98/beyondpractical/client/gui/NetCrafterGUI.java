@@ -81,9 +81,9 @@ public class NetCrafterGUI extends BDBaseGUI<NetCrafterMenu>
             menu.writeAndSendQuickData();
         }) {
             @Override protected void initButton() {
-                iconMap.put(OutputMode.NETWORK, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/popmode_up.png"));
+                iconMap.put(OutputMode.NETWORK, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/net_absorb.png"));
+                iconMap.put(OutputMode.POP, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/popmode_up.png"));
                 iconMap.put(OutputMode.STORAGE, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/popmode_down.png"));
-                iconMap.put(OutputMode.POP, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/hopper_item_mode_allow.png"));
                 tooltipMap.put(OutputMode.NETWORK, Tooltip.create(Component.translatable("tooltip.beyond_practical.output_network")));
                 tooltipMap.put(OutputMode.STORAGE, Tooltip.create(Component.translatable("tooltip.beyond_practical.output_storage")));
                 tooltipMap.put(OutputMode.POP, Tooltip.create(Component.translatable("tooltip.beyond_practical.output_pop")));
@@ -101,9 +101,13 @@ public class NetCrafterGUI extends BDBaseGUI<NetCrafterMenu>
         }) {
             @Override protected void initButton() {
                 iconMap.put(RedStoneControlMode.IGNORE, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/control_mode_ignore.png"));
+                iconMap.put(RedStoneControlMode.NOT_WORKING, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/control_mode_not_working.png"));
                 iconMap.put(RedStoneControlMode.POWERED, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/control_mode_powered.png"));
+                iconMap.put(RedStoneControlMode.UNPOWERED, ResourceLocation.tryBuild(BDConstants.MODID, "textures/gui/sprites/widget/control_mode_unpowered.png"));
                 tooltipMap.put(RedStoneControlMode.IGNORE, Tooltip.create(Component.translatable("tooltip.beyond_practical.redstone_ignore")));
+                tooltipMap.put(RedStoneControlMode.NOT_WORKING, Tooltip.create(Component.translatable("tooltip.beyond_practical.redstone_not_working")));
                 tooltipMap.put(RedStoneControlMode.POWERED, Tooltip.create(Component.translatable("tooltip.beyond_practical.redstone_powered")));
+                tooltipMap.put(RedStoneControlMode.UNPOWERED, Tooltip.create(Component.translatable("tooltip.beyond_practical.redstone_unpowered")));
                 states.addAll(iconMap.keySet());
                 setState(menu.blockEntity.controlMode);
             }
