@@ -4,10 +4,12 @@ import com.solr98.beyondpractical.common.init.BPBlockEntities;
 import com.solr98.beyondpractical.common.menu.NetTypePathwayMenu;
 import com.wintercogs.beyonddimensions.api.capability.helper.CapabilityHelper;
 import com.wintercogs.beyonddimensions.api.dimensionnet.DimensionsNet;
+import com.wintercogs.beyonddimensions.api.dimensionnet.UnifiedStorage;
 import com.wintercogs.beyonddimensions.api.storage.handler.impl.StackHandler;
 import com.wintercogs.beyonddimensions.api.storage.key.IStackKey;
 import com.wintercogs.beyonddimensions.api.storage.key.KeyAmount;
 import com.wintercogs.beyonddimensions.api.util.CapCtx;
+import com.wintercogs.beyonddimensions.api.util.CommonHandler;
 import com.wintercogs.beyonddimensions.api.util.USHandler;
 import com.wintercogs.beyonddimensions.common.block.entity.NetedBlockEntity;
 import com.wintercogs.beyonddimensions.util.SidedCapId;
@@ -22,13 +24,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -56,8 +58,6 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         addNetChangeTask(this::clearCapCache);
     }
 
-    // ========== 白名单 ==========
-
     public StackHandler getFilterSlots()
     {
         return filterSlots;
@@ -74,8 +74,6 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         return list;
     }
 
-    // ========== 能力代理 ==========
-
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side)
     {
@@ -86,24 +84,55 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         {
             if (entry.getValue() != cap) continue;
 
+            List<IStackKey<?>> whitelist = getWhitelistForType(entry.getKey());
+            if (whitelist.isEmpty()) continue;
+
             SidedCapId capId = new SidedCapId(cap, null);
             LazyOptional<?> cached = caps.get(capId);
             if (cached != null && cached.isPresent())
                 return cached.cast();
 
-            List<IStackKey<?>> whitelist = getWhitelistForType(entry.getKey());
-
             Object result;
-            if (!whitelist.isEmpty() && entry.getValue() == ForgeCapabilities.ITEM_HANDLER)
-                result = new FilteredItemHandler(net.getUnifiedStorage(), whitelist);
-            else if (!whitelist.isEmpty() && entry.getValue() == ForgeCapabilities.FLUID_HANDLER)
-                result = new FilteredFluidHandler(net.getUnifiedStorage(), whitelist);
+            CommonHandler ch = CapabilityHelper.CommonHandlerMap.get(entry.getKey());
+            if (ch != null)
+            {
+                UnifiedStorage us = net.getUnifiedStorage();
+                StackHandler temp = new StackHandler(whitelist.size())
+                {
+                    @Override
+                    public @NotNull KeyAmount insert(int slot, IStackKey<?> key, long amount, boolean simulate)
+                    {
+                        KeyAmount r = us.insert(key, amount, simulate);
+                        if (!simulate)
+                            super.setStackDirectly(slot, key, us.getStackByKey(key).amount());
+                        return r;
+                    }
+
+                    @Override
+                    public @NotNull KeyAmount extract(int slot, long count, boolean simulate)
+                    {
+                        IStackKey<?> k = whitelist.get(slot);
+                        KeyAmount r = us.extract(k, count, simulate, false);
+                        if (!simulate)
+                            super.setStackDirectly(slot, k, us.getStackByKey(k).amount());
+                        return r;
+                    }
+                };
+                for (int i = 0; i < whitelist.size(); i++)
+                {
+                    IStackKey<?> k = whitelist.get(i);
+                    temp.setStackDirectly(i, k, us.getStackByKey(k).amount());
+                }
+                result = ch.apply(temp, ch.isContextual() ? new CapCtx(level, getBlockPos(), this) : null);
+            }
             else
             {
-                USHandler handler = CapabilityHelper.USHandlerMap.get(entry.getKey());
-                if (handler == null) return LazyOptional.empty();
-                result = handler.apply(net.getUnifiedStorage(),
-                        handler.isContextual() ? new CapCtx(level, getBlockPos(), this) : null);
+                USHandler uh = CapabilityHelper.USHandlerMap.get(entry.getKey());
+                if (uh == null) return LazyOptional.empty();
+                UnifiedStorage filtered = new FilteredUnifiedStorage(
+                        net.getUnifiedStorage(), new HashSet<>(whitelist));
+                result = uh.apply(filtered,
+                        uh.isContextual() ? new CapCtx(level, getBlockPos(), this) : null);
             }
 
             if (result == null) return LazyOptional.empty();
@@ -130,8 +159,6 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         caps.clear();
     }
 
-    // ========== NBT ==========
-
     @Override
     public void load(CompoundTag tag)
     {
@@ -147,8 +174,6 @@ public class NetTypePathwayBlockEntity extends NetedBlockEntity implements MenuP
         super.saveAdditional(tag);
         tag.put("filterSlots", filterSlots.serializeNBT());
     }
-
-    // ========== MenuProvider ==========
 
     @Override
     public Component getDisplayName()

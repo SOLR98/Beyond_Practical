@@ -1,6 +1,7 @@
 package com.solr98.beyondpractical.common.init;
 
 import com.solr98.beyondpractical.api.ids.BPConstants;
+import com.solr98.beyondpractical.common.block.entity.NetCrafterBlockEntity;
 import com.solr98.beyondpractical.common.block.entity.NetTypePathwayBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -14,6 +15,10 @@ public final class BPBlockEntities
     public static final RegistryObject<BlockEntityType<NetTypePathwayBlockEntity>> NET_TYPE_PATHWAY = BLOCK_ENTITY_TYPES.register(
             "net_type_pathway",
             () -> BlockEntityType.Builder.of(NetTypePathwayBlockEntity::new, BPBlocks.NET_TYPE_PATHWAY.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<NetCrafterBlockEntity>> NET_CRAFTER = BLOCK_ENTITY_TYPES.register(
+            "net_crafter",
+            () -> BlockEntityType.Builder.of(NetCrafterBlockEntity::new, BPBlocks.NET_CRAFTER.get()).build(null));
 
     private BPBlockEntities()
     {

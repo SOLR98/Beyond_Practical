@@ -1,6 +1,8 @@
 package com.solr98.beyondpractical;
 
 import com.solr98.beyondpractical.api.ids.BPConstants;
+import com.solr98.beyondpractical.client.gui.NetCrafterGUI;
+import com.solr98.beyondpractical.network.BPNetwork;
 import com.solr98.beyondpractical.client.gui.NetTypePathwayGUI;
 import com.solr98.beyondpractical.common.init.BPBlockEntities;
 import com.solr98.beyondpractical.common.init.BPBlocks;
@@ -24,6 +26,7 @@ public class BeyondPractical
         BPBlocks.register(modEventBus);
         BPBlockEntities.register(modEventBus);
         BPMenus.register(modEventBus);
+        BPNetwork.register();
         modEventBus.addListener(this::addCreativeTab);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> modEventBus.addListener(BeyondPractical::clientSetup));
     }
@@ -31,12 +34,18 @@ public class BeyondPractical
     private void addCreativeTab(BuildCreativeModeTabContentsEvent event)
     {
         ResourceLocation tabKey = event.getTabKey().location();
-        if (tabKey.equals(ResourceLocation.tryParse("beyonddimensions:beyond_dimensions_blocks_tab")))
-            event.accept(BPBlocks.NET_TYPE_PATHWAY.get());
+            if (tabKey.equals(ResourceLocation.tryParse("beyonddimensions:beyond_dimensions_blocks_tab")))
+            {
+                event.accept(BPBlocks.NET_TYPE_PATHWAY.get());
+                event.accept(BPBlocks.NET_CRAFTER.get());
+            }
     }
 
     private static void clientSetup(FMLClientSetupEvent event)
     {
-        event.enqueueWork(() -> MenuScreens.register(BPMenus.NET_TYPE_PATHWAY_MENU.get(), NetTypePathwayGUI::new));
+        event.enqueueWork(() -> {
+            MenuScreens.register(BPMenus.NET_TYPE_PATHWAY_MENU.get(), NetTypePathwayGUI::new);
+            MenuScreens.register(BPMenus.NET_CRAFTER_MENU.get(), NetCrafterGUI::new);
+        });
     }
 }

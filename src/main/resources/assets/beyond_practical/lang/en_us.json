@@ -1,4 +1,21 @@
 {
   "block.beyond_practical.net_type_pathway": "Limited Network Pathway",
-  "menu.beyond_practical.net_type_pathway": "Limited Network Pathway"
+  "block.beyond_practical.net_crafter": "Dimensional Network Crafter",
+  "menu.beyond_practical.net_type_pathway": "Limited Network Pathway",
+  "menu.beyond_practical.net_crafter": "Dimensional Network Crafter",
+  "menu.beyond_practical.net_crafter.storage": "Output Storage",
+  "tooltip.beyond_practical.output_network": "Output to Network",
+  "tooltip.beyond_practical.output_storage": "Output to Internal Storage",
+  "tooltip.beyond_practical.output_pop": "Eject to Adjacent",
+  "tooltip.beyond_practical.redstone_ignore": "Redstone: Ignored",
+  "tooltip.beyond_practical.redstone_powered": "Redstone: Powered Only",
+  "tooltip.beyond_practical.recipe_prev": "Previous Recipe",
+  "tooltip.beyond_practical.recipe_next": "Next Recipe",
+  "tooltip.beyond_practical.recipe_confirm": "Confirm Recipe",
+  "tooltip.beyond_practical.direction.0": "Output Down",
+  "tooltip.beyond_practical.direction.1": "Output Up",
+  "tooltip.beyond_practical.direction.2": "Output North",
+  "tooltip.beyond_practical.direction.3": "Output South",
+  "tooltip.beyond_practical.direction.4": "Output West",
+  "tooltip.beyond_practical.direction.5": "Output East"
 }

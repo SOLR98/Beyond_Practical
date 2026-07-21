@@ -1,6 +1,7 @@
 package com.solr98.beyondpractical.common.init;
 
 import com.solr98.beyondpractical.api.ids.BPConstants;
+import com.solr98.beyondpractical.common.menu.NetCrafterMenu;
 import com.solr98.beyondpractical.common.menu.NetTypePathwayMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -15,6 +16,10 @@ public final class BPMenus
     public static final RegistryObject<MenuType<NetTypePathwayMenu>> NET_TYPE_PATHWAY_MENU = MENUS.register(
             "net_type_pathway",
             () -> IForgeMenuType.create(NetTypePathwayMenu::new));
+
+    public static final RegistryObject<MenuType<NetCrafterMenu>> NET_CRAFTER_MENU = MENUS.register(
+            "net_crafter",
+            () -> IForgeMenuType.create(NetCrafterMenu::new));
 
     private BPMenus()
     {

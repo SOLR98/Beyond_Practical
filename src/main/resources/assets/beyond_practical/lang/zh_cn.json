@@ -1,4 +1,21 @@
 {
   "block.beyond_practical.net_type_pathway": "限类网络通道",
-  "menu.beyond_practical.net_type_pathway": "限类网络通道"
+  "block.beyond_practical.net_crafter": "维度合成器",
+  "menu.beyond_practical.net_type_pathway": "限类网络通道",
+  "menu.beyond_practical.net_crafter": "维度合成器",
+  "menu.beyond_practical.net_crafter.storage": "成品仓库",
+  "tooltip.beyond_practical.output_network": "输出到网络",
+  "tooltip.beyond_practical.output_storage": "输出到内部存储",
+  "tooltip.beyond_practical.output_pop": "弹出到相邻",
+  "tooltip.beyond_practical.redstone_ignore": "红石: 忽略",
+  "tooltip.beyond_practical.redstone_powered": "红石: 有信号时工作",
+  "tooltip.beyond_practical.recipe_prev": "上一个配方",
+  "tooltip.beyond_practical.recipe_next": "下一个配方",
+  "tooltip.beyond_practical.recipe_confirm": "确认配方",
+  "tooltip.beyond_practical.direction.0": "向下输出",
+  "tooltip.beyond_practical.direction.1": "向上输出",
+  "tooltip.beyond_practical.direction.2": "向北输出",
+  "tooltip.beyond_practical.direction.3": "向南输出",
+  "tooltip.beyond_practical.direction.4": "向西输出",
+  "tooltip.beyond_practical.direction.5": "向东输出"
 }
