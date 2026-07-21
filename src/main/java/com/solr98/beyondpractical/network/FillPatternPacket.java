@@ -1,6 +1,7 @@
 package com.solr98.beyondpractical.network;
 
 import com.solr98.beyondpractical.common.block.entity.NetCrafterBlockEntity;
+import com.solr98.beyondpractical.common.menu.NetCrafterMenu;
 import com.wintercogs.beyonddimensions.api.storage.key.impl.ItemStackKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -34,6 +35,10 @@ public record FillPatternPacket(BlockPos pos, ItemStack[] items)
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
+            // 校验菜单绑定和距离
+            if (!(player.containerMenu instanceof NetCrafterMenu menu)) return;
+            if (!menu.stillValid(player)) return;
+            if (!menu.blockEntity.getBlockPos().equals(p.pos())) return;
             Level level = player.level();
             if (!level.isLoaded(p.pos())) return;
             if (level.getBlockEntity(p.pos()) instanceof NetCrafterBlockEntity be)

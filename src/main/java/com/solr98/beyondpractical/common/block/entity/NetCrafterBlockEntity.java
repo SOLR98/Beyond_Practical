@@ -142,18 +142,23 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
             recipe = cr;
         }
 
-        // 检查原料是否充足
+        // 检查原料是否充足（合并相同材料后再模拟，避免多格同种材料乐观误报）
         var ingredients = recipe.getIngredients();
         var us = getNet().getUnifiedStorage();
+        java.util.Map<ItemStackKey, Long> merged = new java.util.HashMap<>();
         for (var ing : ingredients)
         {
             if (ing.isEmpty()) continue;
             var stacks = ing.getItems();
             if (stacks.length == 0) continue;
             var key = new ItemStackKey(stacks[0]);
-            long need = (long) stacks[0].getCount() * batchSize;
-            var got = us.extract(key, need, true, false);
-            if (got.amount() < need) return cachedStatus = CrafterStatus.RESOURCE_BLOCKED;
+            long add = (long) stacks[0].getCount() * batchSize;
+            merged.merge(key, add, Long::sum);
+        }
+        for (var entry : merged.entrySet())
+        {
+            if (us.extract(entry.getKey(), entry.getValue(), true, true).amount() < entry.getValue())
+                return cachedStatus = CrafterStatus.RESOURCE_BLOCKED;
         }
 
         if (shouldWork()) return cachedStatus = CrafterStatus.WORKING;
@@ -436,19 +441,6 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
 
             pushOutput(result);
             handleRemainders(remainders);
-
-            for (int r = 0; r < remainders.size(); r++)
-            {
-                var rem = remainders.get(r);
-                if (!rem.isEmpty())
-                {
-                    var existing = batchBuffer.getStackInSlot(r);
-                    if (existing.isEmpty())
-                        batchBuffer.setStackInSlot(r, rem.copy());
-                    else if (ItemStack.isSameItemSameTags(existing, rem))
-                        existing.grow(rem.getCount());
-                }
-            }
         }
     }
 
@@ -601,6 +593,13 @@ public class NetCrafterBlockEntity extends BaseMachineBlockEntity implements Men
                         stack.shrink(add);
                         if (stack.isEmpty()) return;
                     }
+                }
+                // 仓库满 → 溢出到网络
+                if (!stack.isEmpty())
+                {
+                    var net = getNet();
+                    if (net != null)
+                        net.getUnifiedStorage().insert(new ItemStackKey(stack), stack.getCount(), false);
                 }
             }
         }
